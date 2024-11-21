@@ -1,0 +1,375 @@
+types
+	HIRE_SIGNAL = <UNDERSTAFFED> | <OVERSTAFFED> | <NO_CHANGE>;
+	CostDriver ::
+		value: [real];
+
+values
+	DRIVER_MIN: real = 0;
+	DRIVER_MAX: real = 2;
+	DSI_MIN: int = 0;
+	EAF_MIN: real = 0;
+
+state Estimator of
+  CPLX: [CostDriver]
+  RELY: [CostDriver]
+  DATA: [CostDriver]
+  TIME: [CostDriver]
+  STOR: [CostDriver]
+  VIRT: [CostDriver]
+  TURN: [CostDriver]
+  ACAP: [CostDriver]
+  AEXP: [CostDriver]
+  PCAP: [CostDriver]
+  VEXP: [CostDriver]
+  LEXP: [CostDriver]
+  MODP: [CostDriver]
+  TOOL: [CostDriver]
+  SCED: [CostDriver]
+
+  DSI: [int]
+  PreviousEAF: [real]
+  CurrentEAF: [real]
+
+  inv mk_Estimator(cp, re, da, ti, sto, vi, tu, ac, ae, pc, ve, le, mo, too, sc, d, p, c) ==
+		(d = nil or d > DSI_MIN) and (p = nil or p > EAF_MIN) and (c = nil or p > EAF_MIN)
+		and (cp = nil or driverInRange(cp))
+		and (re = nil or driverInRange(re))
+		and (da = nil or driverInRange(da))
+		and (ti = nil or driverInRange(ti))
+		and (sto = nil or driverInRange(sto))
+		and (vi = nil or driverInRange(vi))
+		and (tu = nil or driverInRange(tu))
+		and (ac = nil or driverInRange(ac))
+		and (ae = nil or driverInRange(ae))
+		and (pc = nil or driverInRange(pc))
+		and (ve = nil or driverInRange(ve))
+		and (le = nil or driverInRange(le))
+		and (mo = nil or driverInRange(mo))
+		and (too = nil or driverInRange(too))
+		and (sc = nil or driverInRange(sc))
+
+
+  init mk_Estimator(cp, re, da, ti, sto, vi, tu, ac, ae, pc, ve, le, mo, too, sc, d, p, c) ==
+		d = nil and p = nil and c = nil
+		and cp = mk_CostDriver(nil) and re = nil and da = nil and ti = nil and sto = nil
+		and vi = nil and tu = nil and ac = nil and ae = nil and pc = nil
+		and ve = nil and le = nil and mo = nil and too = nil and sc = nil
+		
+end
+
+functions
+driverInRange(val: CostDriver) result: bool
+  pre true
+  post result <=> DRIVER_MIN < val.value and val.value < DRIVER_MAX
+
+operations
+setInitialCPLX(cplxIn : real)
+ext wr CPLX : [CostDriver]
+pre CPLX = nil
+post not (CPLX = nil) and CPLX.value = cplxIn;
+ 
+setInitialRELY(relyIn : real)
+ext wr RELY : [CostDriver]
+pre RELY = nil
+post not (RELY = nil) and RELY.value = relyIn;
+ 
+setInitialDATA(dataIn : real)
+ext wr DATA : [CostDriver]
+pre DATA = nil
+post not (DATA = nil) and DATA.value = dataIn;
+ 
+
+setInitialTIME(timeIn : real)
+ext wr TIME : [CostDriver]
+pre TIME = nil
+post not (TIME = nil) and TIME.value = timeIn;
+ 
+setInitialSTOR(storIn : real)
+ext wr STOR : [CostDriver]
+pre STOR = nil
+post not (STOR = nil) and STOR.value = storIn;
+
+setInitialVIRT(virtIn : real)
+ext wr VIRT : [CostDriver]
+pre VIRT = nil
+post not (VIRT = nil) and VIRT.value = virtIn;
+ 
+setInitialTURN(turnIn : real)
+ext wr TURN : [CostDriver]
+pre TURN = nil
+post not (TURN = nil) and TURN.value = turnIn;
+ 
+setInitialACAP(acapIn : real)
+ext wr ACAP : [CostDriver]
+pre ACAP = nil
+post not (ACAP = nil) and ACAP.value = acapIn;
+ 
+setInitialAEXP(aexpIn : real)
+ext wr AEXP : [CostDriver]
+pre AEXP = nil
+post not (AEXP = nil) and AEXP.value = aexpIn;
+ 
+
+setInitialPCAP(pcapIn : real)
+ext wr PCAP : [CostDriver]
+pre PCAP = nil
+post not (PCAP = nil) and PCAP.value = pcapIn;
+ 
+
+setInitialVEXP(vexpIn : real)
+ext wr VEXP : [CostDriver]
+pre VEXP = nil
+post not (VEXP = nil) and VEXP.value = vexpIn;
+
+setInitialLEXP(lexpIn : real)
+ext wr LEXP : [CostDriver]
+pre LEXP = nil
+post not (LEXP = nil) and LEXP.value = lexpIn;
+ 
+setInitialMODP(modpIn : real)
+ext wr MODP : [CostDriver]
+pre MODP = nil
+post not (MODP = nil) and MODP.value = modpIn;
+ 
+setInitialTOOL(toolIn : real)
+ext wr TOOL : [CostDriver]
+pre TOOL = nil
+post not (TOOL = nil) and TOOL.value = toolIn;
+ 
+setInitialSCED(scedIn : real)
+ext wr SCED : [CostDriver]
+pre SCED = nil
+post not (SCED = nil) and SCED.value = scedIn;
+ 
+setDSI(dsiIn : int)
+ext wr DSI : [int]
+	  wr CurrentEAF : [real]
+	  rd CPLX, RELY, DATA, TIME, STOR, VIRT, TURN, ACAP, AEXP, PCAP, 
+  VEXP, LEXP, MODP, TOOL, SCED : [CostDriver]
+pre not (CPLX = nil) and not (RELY = nil) and not (DATA = nil) and not (TIME = nil) and not (STOR = nil) and
+not (VIRT = nil) and not (TURN = nil) and not (ACAP = nil) and not (AEXP = nil) and not (PCAP = nil) and
+not (VEXP = nil) and not (LEXP = nil) and not (MODP = nil) and not (TOOL = nil) and not (SCED = nil) and
+    DSI = nil and CurrentEAF = nil
+post (DSI = dsiIn) and CurrentEAF = CPLX.value * RELY.value * DATA.value 
+* TIME.value * STOR.value * VIRT.value * TURN.value * ACAP.value 
+* AEXP.value * PCAP.value * VEXP.value * LEXP.value * MODP.value 
+* TOOL.value * SCED.value;
+
+calculateStaffChange () SignalOut : HIRE_SIGNAL
+ext rd PreviousEAF : [real]
+    rd CurrentEAF : [real]
+    rd DSI : [int]
+pre not (DSI = nil) and not (PreviousEAF = nil)
+post (PreviousEAF < CurrentEAF and SignalOut = <UNDERSTAFFED>) or
+    	(PreviousEAF > CurrentEAF and SignalOut = <OVERSTAFFED> ) or
+   	(PreviousEAF = CurrentEAF and SignalOut = <NO_CHANGE>);
+
+updateInitialCPLX(cplxIn : real)
+ext wr CPLX : [CostDriver]
+    wr PreviousEAF : [real]
+    wr CurrentEAF : [real]
+  	rd RELY, DATA, TIME, STOR, VIRT, TURN, ACAP, AEXP, PCAP, VEXP, 
+LEXP, MODP, TOOL, SCED : [CostDriver]
+pre not (CPLX = nil)
+post (CPLX.value = cplxIn) and (PreviousEAF = CurrentEAF) and 
+       	(CurrentEAF = cplxIn * RELY.value * DATA.value * TIME.value 
+* STOR.value * VIRT.value * TURN.value * ACAP.value * 
+AEXP.value * PCAP.value * VEXP.value * LEXP.value * 
+MODP.value * TOOL.value * SCED.value);
+ 
+updateInitialRELY(relyIn : real)
+ext wr RELY : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, DATA, TIME, STOR, VIRT, TURN, ACAP, AEXP, PCAP, VEXP, 
+LEXP, MODP, TOOL, SCED : [CostDriver]
+pre not (RELY = nil)
+post (RELY.value = relyIn) and (PreviousEAF = CurrentEAF) and 
+     (CurrentEAF = CPLX.value * relyIn * DATA.value * TIME.value * 
+STOR.value * VIRT.value * TURN.value * ACAP.value * AEXP.value * 
+PCAP.value * VEXP.value * LEXP.value * MODP.value * TOOL.value * 
+SCED.value);
+ 
+updateInitialDATA(dataIn : real)
+ext wr DATA : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, RELY, TIME, STOR, VIRT, TURN, ACAP, AEXP, PCAP, VEXP, 
+LEXP, MODP, TOOL, SCED :  [CostDriver]
+pre not (DATA = nil)
+post (DATA.value = dataIn) and (PreviousEAF = CurrentEAF) and
+       	(CurrentEAF = CPLX.value * RELY.value * dataIn * TIME.value 
+* STOR.value * VIRT.value * TURN.value * ACAP.value * 
+AEXP.value * PCAP.value * VEXP.value * LEXP.value *
+        	MODP.value * TOOL.value * SCED.value);
+ 
+updateInitialTIME(timeIn : real)
+ext wr TIME : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, RELY, DATA, STOR, VIRT, TURN, ACAP, AEXP, PCAP, VEXP, 
+LEXP, MODP, TOOL, SCED :  [CostDriver]
+pre not (TIME = nil)
+post (TIME.value = timeIn) and (PreviousEAF = CurrentEAF) and
+       	(CurrentEAF = CPLX.value * RELY.value * DATA.value * timeIn 
+* STOR.value * VIRT.value * TURN.value * ACAP.value * 
+AEXP.value * PCAP.value * VEXP.value * LEXP.value * 
+MODP.value * TOOL.value * SCED.value);
+
+updateInitialSTOR(storIn : real)
+ext wr STOR : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, RELY, DATA, TIME, VIRT, TURN, ACAP, AEXP, PCAP, VEXP, 
+LEXP, MODP, TOOL, SCED :  [CostDriver]
+pre not (STOR = nil)
+post (STOR.value = storIn) and (PreviousEAF = CurrentEAF) and
+     (CurrentEAF = CPLX.value * RELY.value * DATA.value * TIME.value * 
+storIn * VIRT.value * TURN.value * ACAP.value * AEXP.value * 
+PCAP.value * VEXP.value * LEXP.value * MODP.value * TOOL.value * 
+SCED.value);
+ 
+updateInitialVIRT(virtIn : real)
+ext wr VIRT : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, RELY, DATA, TIME, STOR, TURN, ACAP, AEXP, PCAP, VEXP, 
+LEXP, MODP, TOOL, SCED : [CostDriver]
+pre not (VIRT = nil)
+post (VIRT.value = virtIn) and (PreviousEAF = CurrentEAF) and
+     (CurrentEAF = CPLX.value * RELY.value * DATA.value * TIME.value * 
+STOR.value * virtIn * TURN.value * ACAP.value * AEXP.value * 
+PCAP.value * VEXP.value * LEXP.value * MODP.value * TOOL.value * 
+SCED.value);
+ 
+updateInitialTURN(turnIn : real)
+ext wr TURN : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, RELY, DATA, TIME, STOR, VIRT, ACAP, AEXP, PCAP, VEXP, 
+LEXP, MODP, TOOL, SCED : [CostDriver]
+pre not (TURN = nil)
+post (TURN.value = turnIn) and (PreviousEAF = CurrentEAF) and
+     (CurrentEAF = CPLX.value * RELY.value * DATA.value * TIME.value * 
+STOR.value * VIRT.value * turnIn * ACAP.value * AEXP.value * 
+PCAP.value * VEXP.value * LEXP.value * MODP.value * TOOL.value * 
+SCED.value);
+ 
+updateInitialACAP(acapIn : real)
+ext wr ACAP : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, RELY, DATA, TIME, STOR, VIRT, TURN, AEXP, PCAP, VEXP, 
+LEXP, MODP, TOOL, SCED : [CostDriver]
+pre not (ACAP = nil)
+post (ACAP.value = acapIn) and (PreviousEAF = CurrentEAF) and
+     (CurrentEAF = CPLX.value * RELY.value * DATA.value * TIME.value * 
+STOR.value * VIRT.value * TURN.value * acapIn * AEXP.value * 
+PCAP.value * VEXP.value * LEXP.value * MODP.value * TOOL.value * 
+SCED.value);
+
+updateInitialAEXP(aexpIn : real)
+ext wr AEXP : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, RELY, DATA, TIME, STOR, VIRT, TURN, ACAP, PCAP, VEXP, 
+LEXP, MODP, TOOL, SCED :  [CostDriver]
+pre not (AEXP = nil)
+post (AEXP.value = aexpIn) and (PreviousEAF = CurrentEAF) and
+     (CurrentEAF = CPLX.value * RELY.value * DATA.value * TIME.value * 
+STOR.value * VIRT.value * TURN.value * ACAP.value * aexpIn * 
+PCAP.value * VEXP.value * LEXP.value * MODP.value * TOOL.value * 
+SCED.value);
+ 
+updateInitialPCAP(pcapIn : real)
+ext wr PCAP : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, RELY, DATA, TIME, STOR, VIRT, TURN, ACAP, AEXP, VEXP, 
+LEXP, MODP, TOOL, SCED :  [CostDriver]
+pre not (PCAP = nil)
+post (PCAP.value = pcapIn) and (PreviousEAF = CurrentEAF) and        	
+(CurrentEAF = CPLX.value * RELY.value * DATA.value * TIME.value * 
+STOR.value * VIRT.value * TURN.value * ACAP.value * AEXP.value * 
+pcapIn * VEXP.value * LEXP.value * MODP.value * TOOL.value * 
+SCED.value);
+ 
+updateInitialVEXP(vexpIn : real)
+ext wr VEXP : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, RELY, DATA, TIME, STOR, VIRT, TURN, ACAP, AEXP, PCAP, 
+LEXP, MODP, TOOL, SCED : [CostDriver]
+pre not (VEXP = nil)
+post (VEXP.value = vexpIn) and (PreviousEAF = CurrentEAF) and 
+(CurrentEAF = CPLX.value * RELY.value * DATA.value * TIME.value * 
+STOR.value * VIRT.value * TURN.value * ACAP.value * AEXP.value * 
+PCAP.value * vexpIn * LEXP.value * MODP.value * TOOL.value * 
+SCED.value);
+
+updateInitialLEXP(lexpIn : real)
+ext wr LEXP : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, RELY, DATA, TIME, STOR, VIRT, TURN, ACAP, AEXP, PCAP, 
+VEXP, MODP, TOOL, SCED :  [CostDriver]
+pre not (LEXP = nil)
+post (LEXP.value = lexpIn) and (PreviousEAF = CurrentEAF) and
+(CurrentEAF = CPLX.value * RELY.value * DATA.value * TIME.value * 
+STOR.value * VIRT.value * TURN.value * ACAP.value * AEXP.value * 
+PCAP.value * VEXP.value * lexpIn * MODP.value * TOOL.value * 
+SCED.value);
+
+updateInitialMODP(modpIn : real)
+ext wr MODP : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, RELY, DATA, TIME, STOR, VIRT, TURN, ACAP, AEXP, PCAP, 
+VEXP, LEXP, TOOL, SCED : [CostDriver]
+pre not (MODP = nil)
+post (MODP.value = modpIn) and (PreviousEAF = CurrentEAF) and
+(CurrentEAF = CPLX.value * RELY.value * DATA.value * TIME.value * 
+STOR.value * VIRT.value * TURN.value * ACAP.value * AEXP.value * 
+PCAP.value * VEXP.value * LEXP.value * modpIn * TOOL.value * 
+SCED.value);
+
+updateInitialTOOL(toolIn : real)
+ext wr TOOL : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, RELY, DATA, TIME, STOR, VIRT, TURN, ACAP, AEXP, PCAP, 
+VEXP, LEXP, MODP, SCED :  [CostDriver]
+pre not (TOOL = nil)
+post (TOOL.value = toolIn) and (PreviousEAF = CurrentEAF) and
+(CurrentEAF = CPLX.value * RELY.value * DATA.value * TIME.value * 
+STOR.value * VIRT.value * TURN.value * ACAP.value * AEXP.value * 
+PCAP.value * VEXP.value * LEXP.value * MODP.value * toolIn * 
+SCED.value);
+
+updateInitialSCED(scedIn : real)
+ext wr SCED : [CostDriver]
+  	wr PreviousEAF : [real]
+  	wr CurrentEAF : [real]
+  	rd CPLX, RELY, DATA, TIME, STOR, VIRT, TURN, ACAP, AEXP, PCAP, 
+VEXP, LEXP, MODP, TOOL : [CostDriver]
+pre not (SCED = nil)
+post (SCED.value = scedIn) and (PreviousEAF = CurrentEAF) and
+(CurrentEAF = CPLX.value * RELY.value * DATA.value * TIME.value * 
+STOR.value * VIRT.value * TURN.value * ACAP.value * AEXP.value * 
+PCAP.value * VEXP.value * LEXP.value * MODP.value * TOOL.value * 
+scedIn);
+
+getCurrentEAF(currentEAFIn: real) 
+ext wr CurrentEAF: [real] 
+pre CurrentEAF = nil 
+post CurrentEAF = currentEAFIn;
+
+getPreviousEAF(prevEAF: real) 
+ext wr PreviousEAF: [real] 
+pre PreviousEAF = nil
+post PreviousEAF = prevEAF;
+
+getDSI(dsiIn: int) 
+ext wr DSI: [int] 
+pre DSI = nil 
+post DSI = dsiIn;
