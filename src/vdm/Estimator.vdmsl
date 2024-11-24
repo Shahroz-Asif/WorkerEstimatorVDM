@@ -51,7 +51,7 @@ state Estimator of
 
   init mk_Estimator(cp, re, da, ti, sto, vi, tu, ac, ae, pc, ve, le, mo, too, sc, d, p, c) ==
 		d = nil and p = nil and c = nil
-		and cp = mk_CostDriver(nil) and re = nil and da = nil and ti = nil and sto = nil
+		and cp = nil and re = nil and da = nil and ti = nil and sto = nil
 		and vi = nil and tu = nil and ac = nil and ae = nil and pc = nil
 		and ve = nil and le = nil and mo = nil and too = nil and sc = nil
 		
